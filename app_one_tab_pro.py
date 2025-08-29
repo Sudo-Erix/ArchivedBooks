@@ -9,8 +9,7 @@ import sys
 from pathlib import Path
 
 def resource_path(rel: str) -> str:
-    base = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))
-    return str(base / rel)
+    return str(Path(__file__).resolve().parent / rel)
 
 @st.cache_data(show_spinner=False)
 def load_logo_b64(rel_path: str = ".streamlit/static/assets/logo.jpg") -> str:

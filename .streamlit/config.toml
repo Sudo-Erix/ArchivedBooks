@@ -4,11 +4,10 @@ developmentMode = false
 [server]
 headless = true
 fileWatcherType = "auto"
-# روی کلود نیازی به address/port نیست
 
 [browser]
 gatherUsageStats = false
 
 [logger]
-level = "error"            # لاگ‌ها را تمیز می‌کند
+level = "error"
 messageFormat = "%(asctime)s %(levelname)s %(message)s"
