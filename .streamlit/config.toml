@@ -1,21 +1,14 @@
 [global]
-developmentMode = false   # خاموش کردن Dev Frontend
+developmentMode = false
 
 [server]
 headless = true
-address = "localhost"
-port = 8501
-fileWatcherType = "none"
-
-# یکی از این دو حالت (باهم True یا باهم False):
-enableCORS = true
-enableXsrfProtection = true
-
-# اگر نیاز به Cross-Origin داری:
-# enableCORS = false
-# enableXsrfProtection = false
+fileWatcherType = "auto"
+# روی کلود نیازی به address/port نیست
 
 [browser]
-serverAddress = "localhost"
-serverPort = 8501
 gatherUsageStats = false
+
+[logger]
+level = "error"            # لاگ‌ها را تمیز می‌کند
+messageFormat = "%(asctime)s %(levelname)s %(message)s"
