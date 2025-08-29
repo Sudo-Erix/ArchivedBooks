@@ -1,0 +1,21 @@
+[global]
+developmentMode = false   # خاموش کردن Dev Frontend
+
+[server]
+headless = true
+address = "localhost"
+port = 8501
+fileWatcherType = "none"
+
+# یکی از این دو حالت (باهم True یا باهم False):
+enableCORS = true
+enableXsrfProtection = true
+
+# اگر نیاز به Cross-Origin داری:
+# enableCORS = false
+# enableXsrfProtection = false
+
+[browser]
+serverAddress = "localhost"
+serverPort = 8501
+gatherUsageStats = false
