@@ -1,23 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Kaveh Books Archive — Desktop GUI (PySide6)
-نسخه‌ی بازنگری‌شده با نمایش عالی برای عنوان‌های بلند + تغییر اندازه‌ی دستی ستون‌ها
---------------------------------------------------------------------------
-- ظاهر حرفه‌ای، راست‌به‌چپ، فونت فارسی سفارشی
-- جدول با:
-  • ستون‌ها قابل تغییر اندازه با ماوس (Interactive)
-  • «عنوان» چندخطی با ارتفاع سطر خودکار
-  • دکمه‌ی «متناسب‌سازی هوشمند ستون‌ها با محتوا» (Auto-Fit)
-  • ذخیره/بازیابی اندازه‌ی ستون‌ها بین اجراها (QSettings)
-- هم‌خوان با همان شِما/ستون‌ها/شیت اکسل اپ Streamlit شما
 
-نیازمندی‌ها:
-  pip install PySide6 pandas openpyxl
-
-بسته‌بندی (مثال PyInstaller):
-  pyinstaller --noconfirm --windowed --onefile     --add-data "assets/fonts/IRANSans.ttf:assets/fonts"     --add-data "assets/logo.jpg:assets"     kaveh_books1.py
-"""
 import os
 import sys
 import sqlite3
@@ -42,7 +25,7 @@ APP_KEY  = "KavehBooksDesktop"
 DEFAULT_DB = "books_archive.db"
 SHEET_NAME = "آرشیو کتاب‌ها"  # همان شیت استریم‌لیت
 
-# نگاشت ستون‌ها دقیقاً مطابق اپ Streamlit
+
 COLUMN_MAP = {
     'شماره کتاب': 'book_id',
     'برند ماشین‌آلات': 'brand',
@@ -54,7 +37,7 @@ COLUMN_MAP = {
     'محل نگهداری': 'location'
 }
 
-# اسکیمای دیتابیس (همان)
+
 SCHEMA = '''
 PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS brands (id INTEGER PRIMARY KEY, name TEXT UNIQUE NOT NULL);
@@ -79,7 +62,7 @@ CREATE TABLE IF NOT EXISTS books (
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 '''
 
-# ستون‌های نمایشی فارسی (مطابق Query اپ شما)
+
 DISPLAY_COLUMNS = [
     "شماره", "عنوان", "برند", "مدل", "نوع ماشین‌آلات", "زبان", "سال/ورژن", "محل نگهداری"
 ]
@@ -88,7 +71,7 @@ ASSETS_DIR = Path("assets")
 FONT_PATH = ASSETS_DIR / "fonts/IRANSansX-Regular.ttf"  # می‌توانید Vazirmatn را جایگزین کنید
 LOGO_PATH = ASSETS_DIR / "logo.jpg"
 
-# -------------------- Utils --------------------
+
 def resource_path(rel: str) -> str:
     try:
         base = Path(sys._MEIPASS)  # PyInstaller
@@ -113,7 +96,7 @@ def load_persian_font() -> Optional[str]:
         pass
     return None
 
-# ----------------- DB Helpers -----------------
+
 
 def create_schema(conn: sqlite3.Connection, drop: bool = False):
     cur = conn.cursor()
@@ -152,13 +135,13 @@ def load_excel_to_df(xl_path: str) -> pd.DataFrame:
 def populate_replace(conn: sqlite3.Connection, df: pd.DataFrame):
     create_schema(conn, drop=True)
     cur = conn.cursor()
-    # بارگذاری اولیه جداول بُعدی
+
     for t, col in [('brands', 'brand'), ('machine_types', 'machine_type'),
                    ('models', 'model'), ('languages', 'language')]:
         for v in sorted(df[col].dropna().unique()):
             get_id(cur, t, v)
     conn.commit()
-    # درج کتاب‌ها
+
     for _, r in df.iterrows():
         brand_id = get_id(cur, 'brands', r['brand']) if pd.notna(r['brand']) else None
         mtype_id = get_id(cur, 'machine_types', r['machine_type']) if pd.notna(r['machine_type']) else None
@@ -197,7 +180,7 @@ def load_db_to_df(db_path: str) -> pd.DataFrame:
     conn.close()
     return dfb
 
-# ----------------- Qt Model -----------------
+
 class DataFrameModel(QAbstractTableModel):
     def __init__(self, df: pd.DataFrame):
         super().__init__()
@@ -245,9 +228,9 @@ class DataFrameModel(QAbstractTableModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
-# ----------------- Word-Wrap Delegate -----------------
+
 class WordWrapDelegate(QStyledItemDelegate):
-    """نمایش چندخطی برای ستون‌های تعیین‌شده (مثل «عنوان») با ارتفاع سطر خودکار."""
+
     def __init__(self, wrap_columns: Set[int], parent=None):
         super().__init__(parent)
         self.wrap_columns = set(wrap_columns)
@@ -268,17 +251,17 @@ class WordWrapDelegate(QStyledItemDelegate):
             opt = QStyleOptionViewItem(option)
             self.initStyleOption(opt, index)
             text = opt.text
-            # عرض مؤثرِ متن؛ اگر هنوز صفر است، یک مقدار پیش‌فرض بده
+
             width = max(option.rect.width(), 360)
             doc = QTextDocument()
             doc.setDefaultFont(opt.font)
             doc.setTextWidth(width)
             doc.setPlainText(text)
-            h = int(doc.size().height()) + 12  # کمی پدینگ
+            h = int(doc.size().height()) + 12
             return QSize(int(doc.idealWidth()), h)
         return super().sizeHint(option, index)
 
-# ----------------- Main Window -----------------
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -291,32 +274,32 @@ class MainWindow(QMainWindow):
         self._df_full = pd.DataFrame(columns=DISPLAY_COLUMNS)
         self._wrap_enabled = True
 
-        # RTL + Font
+
         QApplication.instance().setLayoutDirection(Qt.RightToLeft)
         fam = load_persian_font()
         base_font = QFont(fam if fam else QApplication.font().family(), 10)
         QApplication.instance().setFont(base_font)
 
-        # Stylesheet
+
         self.setStyleSheet(self._app_stylesheet())
 
-        # UI
+
         self._build_ui()
         self._load_db_if_exists()
         self._update_filters()
         self.apply_filters()
 
-        # Status bar
+
         self.setStatusBar(QStatusBar())
         self.statusBar().showMessage("آماده")
 
-        # Menus
+
         self._build_menu()
 
-        # Restore window & columns
+
         self._restore_window_state()
 
-    # ---------- UI Build ----------
+
     def _build_ui(self):
         banner = self._banner_widget()
         filters = self._filters_panel()
@@ -325,9 +308,9 @@ class MainWindow(QMainWindow):
         self.model = DataFrameModel(self._df_full)
         self.table.setModel(self.model)
 
-        # جدول: رفتار اندازه‌ی ستون‌ها
+
         h = self.table.horizontalHeader()
-        h.setSectionResizeMode(QHeaderView.Interactive)   # تغییر اندازه دستی با ماوس
+        h.setSectionResizeMode(QHeaderView.Interactive)
         h.setStretchLastSection(False)
         self.table.setAlternatingRowColors(True)
         self.table.setWordWrap(True)
@@ -335,14 +318,14 @@ class MainWindow(QMainWindow):
         self.table.setSortingEnabled(True)
         self.table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # ارتفاع سطرها بر اساس محتوا (ویژه‌ی ستون «عنوان»)
+
         v = self.table.verticalHeader()
         v.setSectionResizeMode(QHeaderView.ResizeToContents)
 
-        # Delegate برای چندخطیِ ستون عنوان
+
         self._apply_wrap_delegate()
 
-        # Layout
+
         right = QWidget()
         right_l = QVBoxLayout(right)
         right_l.addWidget(banner)
@@ -440,7 +423,7 @@ class MainWindow(QMainWindow):
         lay.addWidget(row)
         lay.addStretch(1)
 
-        # Auto-apply
+
         self.brand_cmb.currentIndexChanged.connect(self.apply_filters)
         self.type_cmb.currentIndexChanged.connect(self.apply_filters)
         self.model_cmb.currentIndexChanged.connect(self.apply_filters)
@@ -449,7 +432,7 @@ class MainWindow(QMainWindow):
 
         return g
 
-    # ---------- Data / Filters ----------
+
     def _load_db_if_exists(self):
         if Path(self._db_path).exists():
             try:
@@ -501,10 +484,10 @@ class MainWindow(QMainWindow):
         self.count_lbl.setText(f"تعداد نتایج: {len(df)}")
         self.model.set_dataframe(df)
 
-        # بعد از هر تغییری، تناسب ستون‌ها و ارتفاع سطرها را بده
+
         self.smart_autofit_columns()
 
-    # ---------- Actions ----------
+
     def action_rebuild_from_excel(self):
         xlsx, _ = QFileDialog.getOpenFileName(self, "انتخاب فایل اکسل", "", "Excel Files (*.xlsx)")
         if not xlsx:
@@ -541,11 +524,11 @@ class MainWindow(QMainWindow):
         self._db_path = db
         self._load_db_if_exists(); self._update_filters(); self.apply_filters()
 
-    # ---------- Column Fit / Wrap ----------
+
     def toggle_wrap(self, checked: bool):
         self._wrap_enabled = checked
         self._apply_wrap_delegate()
-        # تغییر wrap نیاز به بازسایز ردیف‌ها دارد
+
         self.smart_autofit_columns()
 
     def _apply_wrap_delegate(self):
@@ -556,10 +539,6 @@ class MainWindow(QMainWindow):
             self.table.setItemDelegateForColumn(title_idx, QStyledItemDelegate(self.table))
 
     def smart_autofit_columns(self):
-        """ستون‌ها را بر اساس محتوای نمونه‌ای از ردیف‌ها اندازه می‌کند و ردیف‌ها را هم تنظیم می‌کند.
-        - ستون «عنوان»: بازه‌ی بزرگ‌تر و چندخطی
-        - بقیه ستون‌ها: اندازه‌ی معقول با سقف
-        """
         df = self.model.dataframe()
         if df is None or df.empty:
             return
@@ -567,7 +546,7 @@ class MainWindow(QMainWindow):
         fm = self.table.fontMetrics()
         h = self.table.horizontalHeader()
 
-        # پارامترها
+
         sample_rows = min(800, len(df))
         padding = 28
         title_idx = DISPLAY_COLUMNS.index("عنوان") if "عنوان" in DISPLAY_COLUMNS else 1
@@ -575,11 +554,11 @@ class MainWindow(QMainWindow):
         for col in range(len(DISPLAY_COLUMNS)):
             header_text = str(self.model.headerData(col, Qt.Horizontal, Qt.DisplayRole) or "")
             maxw = fm.horizontalAdvance(header_text) + padding
-            # نمونه‌گیری برای عملکرد بهتر
+
             series = df.iloc[:sample_rows, col].astype(str)
-            # برای عنوان، عرض خیلی بلند باعث اسکرول افقی می‌شود؛ محدود کنیم
+
             if col == title_idx:
-                # برای عنوان فقط چند نمونه‌ی بلند را بررسی کن
+
                 samples = series.sort_values(key=lambda s: s.str.len(), ascending=False).head(50)
             else:
                 samples = series.head(sample_rows)
@@ -597,20 +576,20 @@ class MainWindow(QMainWindow):
             width = max(minw, min(maxw, cap))
             h.resizeSection(col, int(width))
 
-        # ارتفاع سطرها با محتوای چندخطی هماهنگ شود
+
         self.table.resizeRowsToContents()
         self.table.setUpdatesEnabled(True)
 
-        # ذخیره اندازه‌ها
+
         self._save_header_state()
 
     def reset_columns_default(self):
         self.table.horizontalHeader().reset()
-        # دوباره interactive کنیم
+
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         self.smart_autofit_columns()
 
-    # ---------- Window/State ----------
+
     def closeEvent(self, event):
         self._save_window_state()
         super().closeEvent(event)
@@ -641,7 +620,7 @@ class MainWindow(QMainWindow):
             self.table.horizontalHeader().restoreState(state)
         self.settings.endGroup()
 
-    # ---------- Styles ----------
+
     @staticmethod
     def _app_stylesheet() -> str:
         return """
@@ -659,7 +638,7 @@ class MainWindow(QMainWindow):
         QStatusBar { background: transparent; }
         """
 
-# ----------------- Entrypoint -----------------
+
 def main():
     ensure_dirs()
     app = QApplication(sys.argv)
