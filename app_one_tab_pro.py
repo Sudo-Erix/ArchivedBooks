@@ -23,13 +23,11 @@ def load_logo_b64(rel_path: str = ".streamlit/static/assets/logo.jpg") -> str:
 
 
 
-# ================== App Config ==================
+
 st.set_page_config(page_title="آرشیو کتاب‌های فنی شرکت خدمات دریایی کاوه", layout="wide")
 
-# -------------- Theme (RTL + Offline Font + Pro CSS) --------------
+
 def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.woff2"):
-    """Inject a professional RTL theme + offline IRANSansWeb font using Base64.
-    Uses st.markdown to inject CSS in parent document (no iframe)."""
     try:
         font_bytes = Path(font_path).read_bytes()
         b64 = base64.b64encode(font_bytes).decode("utf-8")
@@ -39,7 +37,7 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
 
     st.markdown(f"""
     <style>
-    /* ====== Offline IRANSansWeb ====== */
+    
     @font-face {{
       font-family: 'IRANSansWeb';
       src: url(data:font/woff2;base64,{b64}) format('woff2');
@@ -62,7 +60,7 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
       font-display: swap;
     }}
 
-    /* ====== Design Tokens ====== */
+    
     :root {{
       --brand-primary: #2563eb;
       --brand-primary-600: #1e4fd8;
@@ -76,7 +74,7 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
       --text-muted: #475569;
     }}
 
-    /* ====== Global RTL + Font ====== */
+    
     html, body, .stApp, [data-testid="stAppViewContainer"] * {{
       
       text-align: center ;
@@ -95,11 +93,11 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
       padding-bottom: 2rem;
     }}
 
-    /* Headings */
+    
     h1, h2, h3 {{ letter-spacing: -0.2px; font-weight: 700; color: var(--text); }}
     h1 {{ display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem; }}
 
-    /* Cards */
+    
     .card, .subheader-card, .right-menu {{
       background: var(--surface);
       border: 1px solid var(--border);
@@ -109,7 +107,7 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
     .subheader-card {{ padding: 12px 16px; margin-bottom: 12px; }}
     .right-menu {{ position: sticky; top: 12px; padding: 12px; ; }}
 
-    /* Controls */
+    
     .stTextInput input,
     .stSelectbox div[data-baseweb="select"] div,
     .stFileUploader>div {{
@@ -127,20 +125,16 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
     }}
     .stButton>button:hover, .stDownloadButton>button:hover {{ background: var(--brand-primary-600); transform: translateY(-1px); }}
 
-    /* Radio menu */
+    
     div[role="radiogroup"] label p {{ font-weight:600; }}
 
-    /* Datatable polish */
-    /* تیترهای جدول وسط‌چین */
-    /* === فقط جدول‌ها وسط‌چین شوند === */
-
-    /* 1) رندر قدیمی (HTML table) */
+    
     .stApp .stDataFrame [data-testid="stTable"] thead tr th,
     .stApp .stDataFrame [data-testid="stTable"] tbody tr td {{
       text-align: center !important;   /* وسط */
     }}
     
-    /* 2) رندر جدید (Arrow grid) — سلول‌ها flex هستند */
+    
     .stApp [data-testid="stDataFrame"] div[role="columnheader"],
     .stApp [data-testid="stDataFrame"] div[role="gridcell"] {{
       display: flex !important;
@@ -149,7 +143,7 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
       text-align: center !important;
     }}
 
-    /* Scrollbar */
+    
     * {{ scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }}
     *::-webkit-scrollbar {{ height: 10px; width: 10px; }}
     *::-webkit-scrollbar-thumb {{
@@ -162,7 +156,7 @@ def inject_global_theme(font_path: str = ".streamlit/static/fonts/IRANSansWeb.wo
 
 
 inject_global_theme(resource_path(".streamlit/static/fonts/IRANSansWeb.woff2"))
-# ================== App Data/DB ==================
+
 DEFAULT_DB = "books_archive.db"
 SHEET_NAME = "آرشیو کتاب‌ها"
 
@@ -276,15 +270,15 @@ def load_db_to_df(db_path):
     conn.close()
     return dfb
 
-# ================== State ==================
+
 if "db_path" not in st.session_state:
     st.session_state["db_path"] = "books_archive.db"
 if "df" not in st.session_state:
     st.session_state["df"] = None
 
-# ================== UI ==================
 
-# st.markdown('<div class="subheader-card"><h2>📘 آرشیو کتاب‌های فنی شرکت خدمات دریایی و بندری کاوه</h2></div>', unsafe_allow_html=True)
+
+
 logo_b64 = load_logo_b64()  # اگر مسیر دیگری داری: load_logo_b64("path/to/logo.png")
 
 st.markdown(f"""
