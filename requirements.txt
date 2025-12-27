@@ -1,11 +1,9 @@
-# وابستگی‌های ضروری برنامه
+
 PySide6>=6.5.0
 pandas>=2.0.0
 numpy>=1.24.0
 openpyxl>=3.1.0
 Pillow>=10.0.0
 pyinstaller>=6.0.0
-
-# وابستگی‌های اختیاری برای بهبود عملکرد
 python-dateutil>=2.8.0
 pytz>=2023.0
